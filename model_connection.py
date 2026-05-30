@@ -13,13 +13,13 @@ POSTGRES_CONNECTION = (
     "postgresql+psycopg://postgres:Dipak%40123@localhost:5432/postgres"
 )
 
-COLLECTION_NAME = "documents"
+COLLECTION_NAME = "collection2"  #
 
 PROMPT_TEMPLATE = """
 You are a helpful AI assistant.
 
 Answer using the provided context if dont find then get answer from LLM.
-
+    
 
 Context:
 {context}
@@ -35,7 +35,7 @@ Answer:
 def get_llm():
     return ChatOllama(
         model=OLLAMA_MODEL,
-        temperature=0,
+        temperature=0.5,
     )
 
 

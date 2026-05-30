@@ -1,2 +1,9 @@
 streamlit
-ollama
+langchain
+langchain-community
+langchain-ollama
+langchain-postgres 
+psycopg[binary]
+pgvector
+pypdf
+sqlalchemy

@@ -1,71 +1,69 @@
 import streamlit as st
-from ollama import chat
+
+from backend import answer_question, process_uploaded_file
+
 
 st.set_page_config(
-    page_title="Ollama Chat",
-    page_icon="🤖"
+    page_title="Local RAG Chat",
+    page_icon="🤖",
+    layout="wide",
 )
 
-st.title("🤖 Local Ollama Chat")
+st.title("🤖 Local RAG Chat")
 
-MODEL_NAME = "llama3.2:latest"
 
-# Initialize chat history
+uploaded_file = st.sidebar.file_uploader(
+    "Upload PDF or TXT",
+    type=["pdf", "txt"],
+)
+
+if uploaded_file:
+    with st.spinner("Processing document..."):
+        process_uploaded_file(uploaded_file)
+
+    st.sidebar.success("Document uploaded successfully!")
+
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": "Hello! I am running locally with Ollama 🚀"
+            "content": "Upload a document and ask questions 📄",
         }
     ]
 
-# Display messages
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Chat input
-if prompt := st.chat_input("Ask anything..."):
 
-    # Save user message
-    st.session_state.messages.append({
-        "role": "user",
-        "content": prompt
-    })
+question = st.chat_input("Ask anything...")
 
-    # Show user message
+if question:
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": question,
+        }
+    )
+
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(question)
 
-    # Assistant response
     with st.chat_message("assistant"):
-
         message_placeholder = st.empty()
 
         try:
-
-            response = chat(
-                model=MODEL_NAME,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
-            full_response = response["message"]["content"]
-
+            full_response = answer_question(question)
             message_placeholder.markdown(full_response)
-
         except Exception as e:
-
             full_response = f"Error: {str(e)}"
-
             st.error(full_response)
 
-    # Save assistant response
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": full_response
-    })
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": full_response,
+        }
+    )
